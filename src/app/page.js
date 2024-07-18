@@ -1,112 +1,149 @@
+// pages/index.js
+"use client";
+import { useState } from "react";
+import axios from "axios";
 import Image from "next/image";
+import image from "../../public/Ricksume-Roaster.png";
+import { parse } from "filepond";
 
 export default function Home() {
+  const [parsedText, setParsedText] = useState("");
+
+  const handleBack = () => {
+    setParsedText("");
+  };
+
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append("filepond", file);
+
+    try {
+      const response = await axios.post("/api/upload", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Upload Response:", response);
+      // Assuming response.data contains the parsed text or relevant information
+      setParsedText(response.data);
+    } catch (error) {
+      console.error("Error uploading file:", error);
+      // Handle error
+    }
+  };
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.js</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="flex min-h-screen flex-col items-center justify-between bg-animation">
+      <div id="stars"></div>
+      <div id="stars2"></div>
+      <div id="stars3"></div>
+      <div id="stars4"></div>
+      <div style={{ position: "relative", width: "100%", height: "100%" }}>
+        <div className="absolute-center">
+          {/* <Image src={image} className="image-responsive m-0 p-0" /> */}
+          <div
+            className="m-8 text-green container glass-effect"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+            {parsedText ? (
+              <p
+                className="text-white"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  padding: "0 16px",
+                  color: "white",
+                }}
+              >
+                <div className="center">
+                  <h1 style={{ textAlign: "center", color: "red" }}>Verdict</h1>
+                </div>
+                {parsedText}
+              </p>
+            ) : (
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  padding: "0 16px",
+                  color: "white",
+                }}
+              >
+                <div className="center">
+                  <h2 style={{ textAlign: "center", color: "red" }}>
+                    Warning: Ricksume Roaster Agreement
+                  </h2>
+                </div>
+                <p>
+                  Alright, listen up! This is a binding agreement between you,
+                  the brave but <strong>oh-so-resume-challenged</strong>{" "}
+                  adventurer, and me, Rick Sanchez, the{" "}
+                  <strong>Roastmaster Extraordinaire</strong>. By submitting
+                  your resume, you agree to the following terms and conditions:
+                  <br />
+                  <br />
+                  <strong>1. Thou Shalt Not Whine</strong>: No crying, no
+                  whining, no complaints. If you can't handle the heat, get out
+                  of the multiverse!
+                  <br />
+                  <br />
+                  <strong>2. No Clichés Shall Survive</strong>: If I see "team
+                  player" or "hard worker," I'm gonna lose it. Be original, or
+                  get outta here!
+                  <br />
+                  <br />
+                  <strong>
+                    3. Honesty is the Best Policy (Even if it Hurts)
+                  </strong>
+                  : I'm not here to sugarcoat. If your resume is bad, you're
+                  gonna hear about it.
+                  <br />
+                  <br />
+                  If you, agree to these terms and conditions, upload your
+                  resume below. Get ready to be roasted, enlightened, and
+                  ultimately, resume-revamped! Prepare yourself, 'cause this is
+                  gonna be a ride! Also Relax, I'm not here to steal your data.
+                  I'm Rick Sanchez, not some low-life hacker.
+                </p>
+                <div className="m-0 text-white">
+                  <label
+                    className="custom-file-upload"
+                    style={{ color: "white" }}
+                  >
+                    Upload
+                    <input
+                      type="file"
+                      className="bg-white"
+                      onChange={handleFileUpload}
+                      style={{
+                        width: "100%",
+                        backgroundColor: "white",
+                        visibility: "false",
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+            )}
+          </div>
+          {parsedText ? (
+            <div className="mt-20 text-white">
+              <label
+                className="custom-file-upload"
+                style={{ color: "white" }}
+                onClick={handleBack}
+              >
+                Back
+              </label>
+            </div>
+          ) : null}
         </div>
-      </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800 hover:dark:bg-opacity-30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
       </div>
     </main>
   );

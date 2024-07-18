@@ -16,7 +16,7 @@ export async function POST(req) {
 
     if (uploadedFile instanceof File) {
       fileName = uuidv4();
-      const tempFilePath = `public/${fileName}.pdf`;
+      const tempFilePath = `/tmp/${fileName}.pdf`;
       const fileBuffer = Buffer.from(await uploadedFile.arrayBuffer());
 
       await fs.writeFile(tempFilePath, fileBuffer);

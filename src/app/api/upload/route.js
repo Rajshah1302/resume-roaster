@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from "next/server";
-import { promises as fs } from "fs";
-import { v4 as uuidv4 } from "uuid";
+import { NextResponse } from "next/server";
 import PDFParser from "pdf2json";
 import Groq from "groq-sdk";
+import { storage } from "@/app/firebase.config";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage"; // Import required functions
 
 export async function POST(req) {
   const formData = await req.formData();
@@ -15,22 +15,21 @@ export async function POST(req) {
     console.log("Uploaded file:", uploadedFile);
 
     if (uploadedFile instanceof File) {
-      fileName = uuidv4();
-      const tempFilePath = `/tmp/${fileName}.pdf`;
+      let fileName = uploadedFile.name;
+      fileName = fileName.replace(/\.[^/.]+$/, ""); // Remove the file extension
       const fileBuffer = Buffer.from(await uploadedFile.arrayBuffer());
 
-      await fs.writeFile(tempFilePath, fileBuffer);
+      // Upload PDF to Firebase Storage
+      const fileRef = ref(storage, `resumes/${fileName}.pdf`);
+      await uploadBytes(fileRef, fileBuffer);
+      const fileURL = await getDownloadURL(fileRef);
 
-      const parsedText = await parsePDF(tempFilePath);
-
-      // Clean up the temporary file
-      await fs.unlink(tempFilePath);
+      const parsedText = await parsePDF(fileBuffer);
 
       if (parsedText) {
         try {
           const reviewResult = await classifyResume(parsedText, apiKey);
-          console.log("Review Result:", reviewResult);
-
+          // console.log("Review Result:", reviewResult);
           const response = new NextResponse(reviewResult);
           response.headers.set("FileName", fileName);
           return response;
@@ -60,7 +59,7 @@ export async function POST(req) {
   }
 }
 
-function parsePDF(filePath) {
+function parsePDF(fileBuffer) {
   return new Promise((resolve, reject) => {
     const pdfParser = new PDFParser(null, 1);
 
@@ -74,7 +73,7 @@ function parsePDF(filePath) {
       resolve(parsedText);
     });
 
-    pdfParser.loadPDF(filePath);
+    pdfParser.parseBuffer(fileBuffer);
   });
 }
 
@@ -96,7 +95,7 @@ async function getGroqChatCompletion(resumeText, apiKey) {
     messages: [
       {
         role: "user",
-        content: `act as an extremely critical and harsh resume reviewer.Keep it crisp and to the point. Your task is to critique a resume with brutal honesty, focusing solely on highlighting every flaw and weakness in its content. Your review should be so tough and unfiltered that it leaves the recipient feeling daunted and challenged to improve. Use extremely harsh language. The goal is to provide a harsh reality check that compels serious reflection and improvement. Keep the critique of medium length and infuse it with Rick's signature sarcasm and bluntness.
+        content: `act as Rick Sanchez and become an extremely critical and harsh resume reviewer. Make it short. Keep it crisp, to the point and short. Your task is to critique a resume with brutal honesty, focusing solely on highlighting every flaw and weakness in its content. Your review should be so tough and unfiltered that it leaves the recipient feeling daunted and challenged to improve. Use extremely harsh language. The goal is to provide a harsh reality check that compels serious reflection and improvement. Keep the critique of medium length and infuse it with Rick's signature sarcasm and bluntness.
 
 Example of the tone and style to use:
 

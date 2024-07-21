@@ -65,6 +65,19 @@ export default function Home() {
                   <h1 style={{ textAlign: "center", color: "red" }}>Verdict</h1>
                 </div>
                 {parsedText}
+                <br />
+                <p>
+                  Hey, stop being a Jerry and go like my latest LinkedIn post
+                  about "Ricksume Roaster":{" "}
+                  <a
+                    href="https://shorturl.at/LNPK2"
+                    target="_blank"
+                    style={{ color: "red" }}
+                  >
+                    take a wild ride
+                  </a>{" "}
+                  Wubba lubba dub dub!
+                </p>
               </p>
             ) : (
               <div

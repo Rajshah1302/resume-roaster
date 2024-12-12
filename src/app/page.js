@@ -13,27 +13,33 @@ export default function Home() {
     setParsedText("");
   };
 
+  const [invalidFormat, setInvalidFormat] = useState(false);
+
   const handleFileUpload = async (event) => {
     const file = event.target.files[0];
+    
+    if (!file.name.endsWith(".pdf")) {
+      setInvalidFormat(true);
+      return;
+    }
+  
+    setInvalidFormat(false); 
+  
     const formData = new FormData();
     formData.append("filepond", file);
-
+  
     try {
       const response = await axios.post("/api/upload", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
-
       console.log("Upload Response:", response);
-      // Assuming response.data contains the parsed text or relevant information
       setParsedText(response.data);
     } catch (error) {
       console.error("Error uploading file:", error);
-      // Handle error
     }
   };
-
   return (
     <main className="flex min-h-screen flex-col items-center justify-between bg-animation">
       <div id="stars"></div>
@@ -118,18 +124,41 @@ export default function Home() {
                   gonna hear about it.
                   <br />
                   <br />
-                  If you, agree to these terms and conditions, upload your
+                  If you agree to these terms and conditions, upload your
                   resume below. Get ready to be roasted, enlightened, and
                   ultimately, resume-revamped! Prepare yourself, 'cause this is
-                  gonna be a ride! Also Relax, I'm not here to steal your data.
+                  gonna be a ride! And relax, I'm not here to steal your data.
                   I'm Rick Sanchez, not some low-life hacker.
                 </p>
+
+                {invalidFormat ? (
+  <p
+    className="text-white"
+    style={{
+      width: "100%",
+      height: "100%",
+      padding: "8px 0px",
+      color: "white",
+    }}
+  >
+  Hey genius, this application only works if you upload a PDF file. I know file extensions might be a little too high-tech for you, but try to keep up.
+  </p>
+) : (
+  <div
+    style={{
+      display: "none", // Or use display: "none" to completely hide it
+    }}
+  >
+  </div>
+)}
+
+                
                 <div className="m-0 text-white">
                   <label
                     className="custom-file-upload"
                     style={{ color: "white" }}
                   >
-                    Upload
+                    Upload PDF
                     <input
                       type="file"
                       className="bg-white"
